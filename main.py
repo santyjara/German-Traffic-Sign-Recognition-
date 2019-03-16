@@ -1,4 +1,4 @@
-from gol import model
+from model import model
 import csv
 
 
@@ -9,8 +9,8 @@ input_shape = (height,width,n_ch)
 n_outputs = 43
 test_size = 0.15
 learning_rate = 0.001
-epochs =3
-batch_size = 60
+epochs = 4
+batch_size = 100
 
 # Instance our model
 model = model(input_shape,n_outputs,test_size,learning_rate,epochs,batch_size)
