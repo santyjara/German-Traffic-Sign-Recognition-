@@ -7,10 +7,10 @@ height = 32
 width = height
 input_shape = (height,width,n_ch)
 n_outputs = 43
-test_size = 0.15
-learning_rate = 0.001
-epochs = 4
-batch_size = 100
+test_size = 0.00
+learning_rate = 0
+epochs = 8
+batch_size = 80
 
 # Instance our model
 model = model(input_shape,n_outputs,test_size,learning_rate,epochs,batch_size)
@@ -28,7 +28,7 @@ X_train, X_test, y_train, y_test = model.split(X,y)
 model.train_model(X_train,y_train,X_test,y_test)
 
 # Load the images contained in the test folder
-images,name = model.load_data_to_predict(folder_name='test_files')
+images,name = model.load_data_to_predict('test_files')
 
 # Make predictions
 predictions = model.predict(images)
@@ -50,4 +50,4 @@ def save_submission(predictions,name):
         for i, j in zip(name, predictions):
             writer.writerow({'file_id': i, 'label': j})
 
-#save_submission(predictions,name)
+save_submission(predictions,name)

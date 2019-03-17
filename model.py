@@ -5,7 +5,7 @@ from skimage import io
 from skimage.transform import rescale, resize, downscale_local_mean
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-
+import csv
 
 
 
@@ -105,21 +105,22 @@ class model:
 
 
         model = tf.keras.models.Sequential([
-                                    tf.keras.layers.Conv2D(filters=40, kernel_size=7, padding='same',activation=tf.nn.relu, input_shape=self.input_shape,kernel_initializer='random_uniform'),
+                                    tf.keras.layers.Conv2D(filters=40, kernel_size=7, padding='same',activation=tf.nn.relu, input_shape=self.input_shape,kernel_regularizer=tf.keras.regularizers.l2(0.001)),
                                     tf.keras.layers.BatchNormalization(),
                                     tf.keras.layers.MaxPool2D(pool_size=(2,2), strides=1),
-                                    tf.keras.layers.Conv2D(filters=20,kernel_size=(5,5),padding='same',activation=tf.nn.relu,kernel_initializer='random_uniform'),
+                                    tf.keras.layers.Conv2D(filters=20,kernel_size=(5,5),padding='same',activation=tf.nn.relu,kernel_regularizer=tf.keras.regularizers.l2(0.001)),
                                     #tf.keras.layers.BatchNormalization(),
                                     tf.keras.layers.MaxPool2D(pool_size=(2,2), strides=1),
-                                    tf.keras.layers.Conv2D(filters=10,kernel_size=(3,3),padding='same',activation=tf.nn.relu,kernel_initializer='random_uniform'),
-                                    tf.keras.layers.BatchNormalization(),
+                                    #tf.keras.layers.Dropout(rate=0.3),
+                                    tf.keras.layers.Conv2D(filters=10,kernel_size=(3,3),padding='same',activation=tf.nn.relu,kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+                                    #tf.keras.layers.BatchNormalization(),
                                     tf.keras.layers.MaxPool2D(pool_size=(2,2), strides=1),
                                     tf.keras.layers.Flatten(),
                                     #tf.keras.layers.Dropout(rate=0.2),
-                                    #tf.keras.layers.Dense(units=1024,activation=tf.nn.relu,use_bias=True),
-                                    tf.keras.layers.Dropout(rate=0.3),
+                                    tf.keras.layers.Dense(units=1024,activation=tf.nn.relu,use_bias=True),
+                                    #tf.keras.layers.Dropout(rate=0.2),
                                     #tf.keras.layers.BatchNormalization(),
-                                    tf.keras.layers.Dense(units=512,activation=tf.nn.relu,use_bias=True),
+                                    tf.keras.layers.Dense(units=512,activation=tf.nn.relu,use_bias=True,kernel_regularizer=tf.keras.regularizers.l2(0.00)),
                                     tf.keras.layers.Dense(units=self.n_outputs,use_bias=True,activation=tf.nn.softmax)
                                     ])
 
@@ -135,20 +136,24 @@ class model:
     def load_data_to_predict(self,folder_name):
 
         X=[]
-        name = []
 
-        for i in (os.listdir(folder_name)):
+        with open('test.csv', 'r') as f:
+            reader = csv.reader(f)
+            your_list = list(reader)
+
+        new_list = [your_list[i + 1][0] for i in range(len(your_list) - 1)]
+
+        for i in (new_list):
 
             img=(io.imread(os.path.join(folder_name, i)))
             image_resized = resize(img, (32, 32, 3), anti_aliasing=True)
             image_resized = image_resized/255
 
             X.append(image_resized)
-            name.append(i)
 
-        predictions = np.array(X)
+        images = np.array(X)
 
-        return predictions,name
+        return images,new_list
 
     def predict(self,X):
 
